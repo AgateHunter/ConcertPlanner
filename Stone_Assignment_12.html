@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concert Weather & Essentials</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      height: 100vh;
+      color: #333;
+    }
+
+    .sidebar {
+      width: 66%;
+      background: url('https://source.unsplash.com/1000x1200/?concert,weather') no-repeat center center/cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .overlay {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 2rem;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      color: black;
+    }
+
+    .sidebar-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .artist-search {
+      margin-bottom: 2rem;
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    .artist-search input {
+      padding: 0.6rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-right: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .artist-search button {
+      padding: 0.6rem 1.2rem;
+      background: #1d3557;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .artist-search button:hover {
+      background: #457b9d;
+      transform: translateY(-2px);
+    }
+
+    #artistResults {
+      margin-top: 1rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .artist-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .artist-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .artist-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      object-fit: cover;
+      margin-bottom: 0.5rem;
+    }
+
+    .artist-card a {
+      color: #1d3557;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .artist-card a:hover {
+      text-decoration: underline;
+    }
+
+    .weather-search {
+      font-size: 1rem;
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .weather-search input {
+      padding: 0.6rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-right: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .weather-search button {
+      padding: 0.6rem 1.2rem;
+      margin-top: 0.5rem;
+      background: #2b2d42;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .weather-search button:hover {
+      background: #4a4e69;
+      transform: translateY(-2px);
+    }
+
+    .reset-weather {
+      background: #e63946;
+      margin-left: 0.5rem;
+    }
+
+    .reset-weather:hover {
+      background: #d62828;
+    }
+
+    #results, #forecast {
+      margin-top: 1rem;
+    }
+
+    .main {
+      width: 34%;
+      background: linear-gradient(to bottom right, #f5f7fa, #c3cfe2);
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+
+    h1 {
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      color: #2b2d42;
+    }
+
+    .weather-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 0.75rem 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .weather-buttons button {
+      padding: 0.75rem 1.5rem;
+      background: #2b2d42;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .weather-buttons button:hover {
+      background: #4a4e69;
+      transform: translateY(-3px);
+    }
+
+    .weather-buttons button.active {
+      background: #1d7874;
+    }
+
+    .reset-btn {
+      grid-column: span 3;
+      justify-self: center;
+      padding: 1rem 2.5rem;
+      background: #e63946;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .reset-btn:hover {
+      background: #d62828;
+    }
+
+    .must-haves {
+      width: 100%;
+      max-width: 600px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .item-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+
+    .item-card:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="overlay">
+      <h1 class="sidebar-title">Live Concert Info</h1>
+
+      <div class="artist-search">
+        <p>Want to know when your favorite artist is in town?</p>
+        <input type="text" id="artistInput" placeholder="Enter artist name">
+        <button id="artistSearchBtn">Search Artist</button>
+        <div id="artistResults"></div>
+      </div>
+
+      <div class="weather-search">
+        <p>Curious to know the forecast? Enter a ZIP code to find out:</p>
+        <input type="text" id="zipInput" placeholder="Example, 90210">
+        <button id="searchBtn">Search</button>
+        <button id="resetWeatherBtn" class="reset-weather">Reset Weather</button>
+
+        <div id="results"></div>
+        <div id="forecast"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <h1>Concert Attendance Must Have</h1>
+
+    <div class="weather-buttons">
+      <button onclick="toggleItems(this, 'sunny')">Sunny</button>
+      <button onclick="toggleItems(this, 'overcast')">Overcast</button>
+      <button onclick="toggleItems(this, 'hot')">Hot</button>
+      <button class="reset-btn" onclick="resetList()">Reset</button>
+      <button onclick="toggleItems(this, 'cold')">Cold</button>
+      <button onclick="toggleItems(this, 'rainy')">Rainy</button>
+      <button onclick="toggleItems(this, 'windy')">Windy</button>
+      <button onclick="toggleItems(this, 'snowy')">Snowy</button>
+    </div>
+
+    <div id="mustHaves" class="must-haves"></div>
+  </div>
+
+  <script>
+    let apiKey = "98b5118a6f832077ee78f75f62d14fdc";
+    let lastZip = "";
+
+    let bandsintownAppId = "natalie_stone_final";
+
+    async function searchArtist() {
+      let artist = document.getElementById("artistInput").value.trim();
+      let resultsDiv = document.getElementById("artistResults");
+    
+      // Clear previous results
+      resultsDiv.innerHTML = "";
+    
+      if (!artist) {
+        resultsDiv.innerHTML = "<p style='color:red;'>Please enter an artist name.</p>";
+        return;
+      }
+    
+      let artistInfoUrl = `https://rest.bandsintown.com/artists/${encodeURIComponent(artist)}?app_id=${bandsintownAppId}`;
+      let eventsUrl = `https://rest.bandsintown.com/artists/${encodeURIComponent(artist)}/events?app_id=${bandsintownAppId}&date=upcoming`;
+    
+      try {
+        // Fetch artist info
+        let artistResponse = await fetch(artistInfoUrl);
+        if (!artistResponse.ok) throw new Error("Artist not found");
+        let artistData = await artistResponse.json();
+    
+        // Fetch events
+        let eventsResponse = await fetch(eventsUrl);
+        if (!eventsResponse.ok) throw new Error("Events not found");
+        let eventsData = await eventsResponse.json();
+    
+        // If no upcoming events
+        if (!Array.isArray(eventsData) || eventsData.length === 0) {
+          resultsDiv.innerHTML = `
+            <div class="artist-card">
+              <img src="${artistData.image_url}" alt="${artistData.name}" style="width:100%; border-radius:10px; margin-bottom:0.5rem;">
+              <h3>${artistData.name}</h3>
+              <p>No upcoming shows found.</p>
+            </div>
+          `;
+          return;
+        }
+    
+        // Render up to 5 upcoming events as cards
+        let html = "";
+        eventsData.slice(0, 5).forEach(event => {
+          html += `
+            <div class="artist-card">
+              <img src="${artistData.image_url}" alt="${artistData.name}" style="width:100%; border-radius:10px; margin-bottom:0.5rem;">
+              <h3>${artistData.name}</h3>
+              <strong>${new Date(event.datetime).toLocaleDateString()}</strong><br>
+              ${event.venue.name}, ${event.venue.city}, ${event.venue.country}<br>
+              <a href="${event.url}" target="_blank">Tickets</a>
+            </div>
+          `;
+        });
+    
+        resultsDiv.innerHTML = html;
+    
+      } catch (error) {
+        resultsDiv.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+      }
+    }
+    
+    // Attach event listener
+    document.getElementById("artistSearchBtn").addEventListener("click", searchArtist);
+    
+
+    // ---------------- Weather Search ----------------
+    async function searchWeather() {
+      let zip = document.getElementById("zipInput").value.trim();
+      if (!zip) {
+        document.getElementById("results").innerHTML = "<p style='color:red;'>Please enter a ZIP code.</p>";
+        return;
+      }
+      lastZip = zip;
+
+      let url = `https://api.openweathermap.org/data/2.5/weather?zip=${zip},us&appid=${apiKey}&units=imperial`;
+
+      try {
+        let response = await fetch(url);
+        let data = await response.json();
+
+        if (response.ok) {
+          document.getElementById("results").innerHTML = `
+            <h2>Weather for ${data.name}</h2>
+            <p><strong>Temperature:</strong> ${data.main.temp} °F</p>
+            <p><strong>Feels Like:</strong> ${data.main.feels_like} °F</p>
+            <p><strong>Condition:</strong> ${data.weather[0].description}</p>
+            <button id="forecastBtn">View 5-Day Forecast</button>
+          `;
+          document.getElementById("forecastBtn").addEventListener("click", loadForecast);
+        } else {
+          document.getElementById("results").innerHTML = `<p style="color:red;">${data.message}</p>`;
+        }
+      } catch (error) {
+        document.getElementById("results").innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+      }
+    }
+
+    async function loadForecast() {
+      let url = `https://api.openweathermap.org/data/2.5/forecast?zip=${lastZip},us&appid=${apiKey}&units=imperial`;
+
+      try {
+        let response = await fetch(url);
+        let data = await response.json();
+
+        if (response.ok) {
+          let forecastHTML = "<h2>5-Day Forecast</h2>";
+          let daily = data.list.filter(item => item.dt_txt.includes("12:00:00"));
+
+          daily.forEach(day => {
+            forecastHTML += `
+              <div class="forecast-day">
+                <strong>${new Date(day.dt_txt).toLocaleDateString()}</strong><br/>
+                Temp: ${day.main.temp} °F<br/>
+                Condition: ${day.weather[0].description}
+              </div>
+            `;
+          });
+
+          document.getElementById("forecast").innerHTML = forecastHTML;
+        } else {
+          document.getElementById("forecast").innerHTML = `<p style="color:red;">${data.message}</p>`;
+        }
+      } catch (error) {
+        document.getElementById("forecast").innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+      }
+    }
+
+    document.getElementById("searchBtn").addEventListener("click", searchWeather);
+
+    document.getElementById("resetWeatherBtn").addEventListener("click", () => {
+      document.getElementById("zipInput").value = "";
+      document.getElementById("results").innerHTML = "";
+      document.getElementById("forecast").innerHTML = "";
+    });
+
+    // ---------------- Must-Haves Logic ----------------
+    let essentials = {
+      sunny: ["Sunglasses", "Sunscreen", "Hat"],
+      overcast: ["Light Jacket"],
+      hot: ["Plastic or Metal Water Bottle", "Light Clothes", "Bandana"],
+      cold: ["Puffy Coat", "Hand Warmers", "Gloves", "Warm Layers"],
+      rainy: ["Umbrella", "Raincoat", "Waterproof Boots"],
+      windy: ["Windbreaker", "Cap"],
+      snowy: ["Winter Jacket", "Insulated Gloves", "Snow Boots", "Scarf"]
+    };
+
+    let addedItems = new Set();
+    let activeConditions = new Set();
+
+    function toggleItems(button, condition) {
+      let mustHavesDiv = document.getElementById("mustHaves");
+
+      if (activeConditions.has(condition)) {
+        activeConditions.delete(condition);
+        button.classList.remove("active");
+        essentials[condition].forEach(item => addedItems.delete(item));
+      } else {
+        activeConditions.add(condition);
+        button.classList.add("active");
+        essentials[condition].forEach(item => addedItems.add(item));
+      }
+
+      renderList(mustHavesDiv);
+    }
+
+    function renderList(container) {
+      container.innerHTML = "";
+      addedItems.forEach(item => {
+        let div = document.createElement("div");
+        div.classList.add("item-card");
+        div.textContent = item;
+        container.appendChild(div);
+      });
+    }
+
+    function resetList() {
+      let mustHavesDiv = document.getElementById("mustHaves");
+      mustHavesDiv.innerHTML = "";
+      addedItems.clear();
+      activeConditions.clear();
+      document.querySelectorAll(".weather-buttons button").forEach(btn => btn.classList.remove("active"));
+    }
+  </script>
+</body>
+</html>
+  
+  
+
